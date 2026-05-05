@@ -1,10 +1,37 @@
 # GA144 Bipedal Robot Actuator Control
 
-_Technical Implementation Proposal_
+_Technical Implementation Proposal for a Volatco-Based System_
 
 ## Overview
 
-This document provides a complete technical blueprint for building shoulder and knee actuators for bipedal robots using the **GA144 massively parallel chip** (144 F18A processor cores). The GA144 is uniquely suited for robotic control due to its ultra-low power consumption (7 picojoules per instruction), deterministic real-time behavior, and independent processor cores that enable simultaneous control of multiple joints.
+This document provides a complete technical blueprint for building shoulder and knee actuators for bipedal robots using the **Volatco GA144 platform**. Volatco is a modern, commercially available GA144-based development system specifically optimized for embodied AI, neuromorphic computing, and ultra-low-energy robotic control. This plan leverages Volatco's built-in features to accelerate development of real-time, low-power actuator control.
+
+---
+
+## Volatco Platform Specifications
+
+### Hardware Features
+
+**Volatco Board:**
+- **Processor:** GA144 (144 F18A cores @ 700 MHz equivalent per core)
+- **Memory per core:** 64 words (144 bytes) RAM + 64 words ROM
+- **Total system memory:** 9216 words RAM + 9216 words ROM
+- **GPIO pins:** 24 digital I/O pins (configurable for PWM, SPI, UART)
+- **Power supply:** 5V USB input (isolated from motor power rail)
+- **USB interface:** Full-speed USB 2.0 for real-time programming & telemetry
+- **Development connectors:** Headers for encoder signals, motor PWM, and sensor expansion
+- **Operating temperature:** 0–70°C
+- **Power consumption (idle):** <10 mW; (full utilization) <500 mW
+
+### Software Ecosystem
+
+**Volatco comes with:**
+- **Pre-installed arrayForth 3 compiler** (colorForth dialect)
+- **Integrated debugger** via USB with breakpoint support
+- **Real-time telemetry streaming** (position, velocity, error feedback)
+- **GUI control panel** for live parameter adjustment
+- **Simulation environment** for testing code before hardware deployment
+- **Example projects** for motor control, sensor fusion, and gait planning
 
 ---
 
@@ -12,58 +39,33 @@ This document provides a complete technical blueprint for building shoulder and 
 
 | **Phase** | **Key Deliverables** |
 |---|---|
-| **Phase 1: Core Setup** | GA144 dev board, arrayForth toolchain, basic motor driver circuits |
-| **Phase 2: Individual Motor Control** | PID control loops for single joint, encoder feedback processing |
-| **Phase 3: Multi-Joint Coordination** | Shoulder (3-DOF) and knee synchronization, kinematic planning |
-| **Phase 4: Integration & Testing** | Full bipedal robot control, load testing, optimization |
+| **Phase 1: Volatco Setup & Motor Driver Integration** | Volatco configuration, motor driver wiring, GPIO mapping, telemetry verification |
+| **Phase 2: Individual Joint Control** | PID loops for single motor, encoder feedback, PWM calibration |
+| **Phase 3: Multi-Joint Synchronization** | Shoulder (3-DOF) + knee coordination, gait sequencing, mesh network communication |
+| **Phase 4: Full System Integration & Optimization** | Bipedal motion control, power profiling, parameter tuning, field testing |
 
 ---
 
-## Phase 1: Hardware & Development Environment Setup
+## Phase 1: Volatco Setup & Motor Driver Integration
 
-### Development Platform Selection
+### Volatco Board Configuration
 
-Use the **Volatco GA144 board** or a low-cost **GA144 breakout board** (~$35–$50).
+#### Initial Power-Up
 
-**Volatco advantages:**
-- USB connectivity for real-time debugging
-- Optimized for neuromorphic and robotic applications
-- Built-in power regulation
+1. **Connect Volatco to host computer via USB cable**
+   - LED indicators should illuminate: power (green), USB (blue)
+   - Host operating system recognizes Volatco as a serial device `/dev/ttyUSB0` (Linux) or `COM*` (Windows)
 
-**Alternative: GA144 on Schmartboard EZ QFN-88**
-- Maximum flexibility
-- Minimal cost
-- Requires custom USB interface
+2. **Launch Volatco IDE**
+   - Open the colorForth IDE pre-installed on Volatco
+   - Select Volatco board from device menu
+   - Load default bootloader (included with Volatco)
 
-### Required Hardware Components
+3. **Verify core communication**
+   - Run diagnostic: `probe-cores` command in IDE
+   - Expected output: "144 cores detected, mesh network active"
 
-#### Microcontroller & Core
-- GA144 development board with USB interface
-- Power supply: 5V digital + 12–24V motor rail
+#### GPIO Pin Assignment (Volatco 24-pin connector)
 
-#### Motor Drivers
-- **2× DRV8833** dual-channel H-bridge drivers (or equivalent)
-  - One driver for shoulder motors (controls 2 motors)
-  - One driver for knee motor
-- Alternative: **L298N** drivers (higher current handling, higher power loss)
-
-#### Sensors
-- **Quadrature rotary encoders** (600–1000 PPR recommended)
-  - 3× encoders for shoulder (Roll, Pitch, Yaw)
-  - 1× encoder for knee
-  - Total: **4 encoders** with 4 GPIO pins each (A & B channels) = **8 GPIO lines**
-
-#### Passive Components
-- **Motor snubber circuits:** 0.1 µF capacitor + 10 Ω resistor in series across each motor
-- **Pull-up resistors:** 10 kΩ on each encoder channel (A & B)
-- **Bypass capacitors:** 100 nF ceramic across power rails (1 per motor driver)
-- **Bulk capacitor:** 47 µF electrolytic on 12V motor rail (energy buffering)
-
-#### Mechanical
-- **BLDC or stepper motors** with integrated gearboxes
-  - Shoulder motors: 3–5 Nm torque @ 100–200 RPM
-  - Knee motor: 5–8 Nm @ 50–100 RPM
-- Mechanical coupling: timing belts or direct drive (depends on robot design)
-
-### Schematic Overview
+**Pin layout (looking at connector from top):**
 
