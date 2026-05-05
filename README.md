@@ -1,4 +1,6 @@
-# GA144 Bipedal Robot Actuator Control: Technical Implementation Plan
+# GA144 Bipedal Robot Actuator Control
+
+_Technical Implementation Proposal_
 
 ## Overview
 
@@ -6,14 +8,14 @@ This document provides a complete technical blueprint for building shoulder and 
 
 ---
 
-## Phase Timeline
+## Phase Summary
 
-| **Phase** | **Duration** | **Key Deliverables** |
-|---|---|---|
-| **Phase 1: Core Setup** | 2–3 weeks | GA144 dev board, arrayForth toolchain, basic motor driver circuits |
-| **Phase 2: Individual Motor Control** | 3–4 weeks | PID control loops for single joint, encoder feedback processing |
-| **Phase 3: Multi-Joint Coordination** | 2–3 weeks | Shoulder (3-DOF) and knee synchronization, kinematic planning |
-| **Phase 4: Integration & Testing** | 2–3 weeks | Full bipedal robot control, load testing, optimization |
+| **Phase** | **Key Deliverables** |
+|---|---|
+| **Phase 1: Core Setup** | GA144 dev board, arrayForth toolchain, basic motor driver circuits |
+| **Phase 2: Individual Motor Control** | PID control loops for single joint, encoder feedback processing |
+| **Phase 3: Multi-Joint Coordination** | Shoulder (3-DOF) and knee synchronization, kinematic planning |
+| **Phase 4: Integration & Testing** | Full bipedal robot control, load testing, optimization |
 
 ---
 
@@ -64,5 +66,4 @@ Use the **Volatco GA144 board** or a low-cost **GA144 breakout board** (~$35–$
 - Mechanical coupling: timing belts or direct drive (depends on robot design)
 
 ### Schematic Overview
-
 
